@@ -17,17 +17,20 @@
 html {
   font-size: 16px;
   overflow-x: hidden;
+  width: 100%;
 }
 
 body {
   font-family: 'Inter', 'Roboto', sans-serif;
   overflow-x: hidden;
   min-width: 320px;
+  width: 100%;
 }
 
 #app {
-  width: 100%;
+  width: 100vw;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .gradient-text {
@@ -39,16 +42,21 @@ body {
 
 /* Ensure Quasar doesn't force mobile layout */
 .q-layout {
-  width: 100% !important;
+  width: 100vw !important;
   max-width: none !important;
+  min-width: unset !important;
 }
 
 .q-page-container {
-  width: 100% !important;
+  width: 100vw !important;
+  max-width: none !important;
+  padding-top: 0 !important;
 }
 
 .q-page {
-  width: 100% !important;
+  width: 100vw !important;
+  max-width: none !important;
+  padding-top: 0 !important;
 }
 
 /* Override any mobile-first constraints */

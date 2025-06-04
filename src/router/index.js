@@ -7,12 +7,30 @@ import ApiPlayground from '../views/ApiPlayground.vue'
 import StatusPage from '../views/StatusPage.vue'
 import PrivacyPage from '../views/PrivacyPage.vue'
 import TermsPage from '../views/TermsPage.vue'
+import WhatWeDoPage from '../views/WhatWeDoPage.vue'
+import OurWorkPage from '../views/OurWorkPage.vue'
+import PricingPage from '../views/PricingPage.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Landing',
     component: LandingPage
+  },
+  {
+    path: '/what-we-do',
+    name: 'WhatWeDo',
+    component: WhatWeDoPage
+  },
+  {
+    path: '/our-work',
+    name: 'OurWork',
+    component: OurWorkPage
+  },
+  {
+    path: '/pricing',
+    name: 'Pricing',
+    component: PricingPage
   },
   {
     path: '/about',
