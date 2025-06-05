@@ -106,45 +106,45 @@
                           </filter>
                         </defs>
                         
-                        <!-- Curved Synaptic Connections for 7 nodes -->
+                        <!-- Straight Vertical Synaptic Connections -->
                         <path class="synapse-line synapse-1" 
-                              d="M 100,280 Q 250,220 400,260" 
+                              d="M 200,500 L 200,100" 
                               stroke="url(#synapseGradient1)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-2" 
-                              d="M 400,260 Q 550,200 700,240" 
+                              d="M 350,500 L 350,100" 
                               stroke="url(#synapseGradient2)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-3" 
-                              d="M 700,240 Q 850,180 1000,220" 
+                              d="M 500,500 L 500,100" 
                               stroke="url(#synapseGradient3)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-4" 
-                              d="M 1000,220 Q 1150,160 1300,200" 
+                              d="M 650,500 L 650,100" 
                               stroke="url(#synapseGradient1)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-5" 
-                              d="M 150,380 Q 400,330 650,370" 
+                              d="M 800,500 L 800,100" 
                               stroke="url(#synapseGradient2)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-6" 
-                              d="M 650,370 Q 900,320 1150,360" 
+                              d="M 950,500 L 950,100" 
                               stroke="url(#synapseGradient3)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-7" 
-                              d="M 200,450 Q 500,420 800,450" 
+                              d="M 1100,500 L 1100,100" 
                               stroke="url(#synapseGradient1)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-8" 
-                              d="M 800,450 Q 1100,420 1200,450" 
+                              d="M 1250,500 L 1250,100" 
                               stroke="url(#synapseGradient2)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-9" 
-                              d="M 100,280 Q 400,450 700,240" 
+                              d="M 300,500 L 300,100" 
                               stroke="url(#synapseGradient3)" 
                               filter="url(#glow)" />
                         <path class="synapse-line synapse-10" 
-                              d="M 400,260 Q 850,400 1000,220" 
+                              d="M 750,500 L 750,100" 
                               stroke="url(#synapseGradient1)" 
                               filter="url(#glow)" />
                                 
@@ -171,15 +171,15 @@
                         </circle>
                         
                         <!-- Hidden paths for pulse animation -->
-                        <path id="synapse-path-1" d="M 100,280 Q 250,220 400,260" opacity="0" />
-                        <path id="synapse-path-2" d="M 400,260 Q 550,200 700,240" opacity="0" />
-                        <path id="synapse-path-3" d="M 700,240 Q 850,180 1000,220" opacity="0" />
-                        <path id="synapse-path-4" d="M 1000,220 Q 1150,160 1300,200" opacity="0" />
+                        <path id="synapse-path-1" d="M 200,500 L 200,100" opacity="0" />
+                        <path id="synapse-path-2" d="M 350,500 L 350,100" opacity="0" />
+                        <path id="synapse-path-3" d="M 500,500 L 500,100" opacity="0" />
+                        <path id="synapse-path-4" d="M 650,500 L 650,100" opacity="0" />
                       </svg>
                     </div>
                     
                     <!-- LLM Neural Nodes - Curved Screen Tiles -->
-                    <div class="neural-nodes-container">
+                    <div class="neural-nodes-container" :key="neuralNodesKey">
                       <div 
                         v-for="nodeIndex in 7" 
                         :key="nodeIndex" 
@@ -432,6 +432,7 @@ import UniversalHeader from '../components/UniversalHeader.vue'
 const heroRef = ref(null)
 const signalsRef = ref(null)
 const parallaxY = ref(0)
+const neuralNodesKey = ref(0) // Force re-render of neural nodes on resize
 
 const features = ref([
   {
@@ -460,33 +461,42 @@ const features = ref([
   }
 ]);
 
-// Neural Network LLM Carousel positioning logic - Flat Tilted Layout
+// Flat Horizontal Carousel Layout - Inward Angled Tiles - RESPONSIVE
 const getNeuralNodeStyle = (index) => {
-  const totalNodes = 7;
-  const centerIndex = 3; // Middle node (index 3)
+  // Get viewport width to calculate responsive offsets
+  const viewportWidth = window.innerWidth || 1400;
   
-  // Calculate position across full screen width
-  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
-  const tileWidth = 200;
-  const totalWidth = screenWidth * 0.9; // Use 90% of screen width
-  const spacing = totalWidth / (totalNodes - 1);
+  // Base scale factor based on viewport width (1400px = 1.0, scales down for smaller screens)
+  const baseScale = Math.min(1.0, viewportWidth / 1400);
   
-  // Position from left to right across screen
-  const x = (index * spacing) - (totalWidth / 2);
-  const y = 0; // Keep all tiles at same height
+  // Reduce rotation angles on smaller screens for better visibility
+  const rotationScale = viewportWidth > 768 ? 1 : 0.6;
   
-  // Calculate tilt angle toward center
-  const distanceFromCenter = index - centerIndex;
-  const maxTiltAngle = 25; // Maximum tilt angle in degrees
-  const tiltAngle = -distanceFromCenter * (maxTiltAngle / 3); // Tiles tilt toward center
+  // Full width carousel with inward-facing tiles - RESPONSIVE SPREAD
+  const carouselLayout = [
+    // T1 - Far left edge, facing inward (toward center) 
+    { xOffsetVw: -35 * baseScale, scale: 1.0 * baseScale, rotateY: 85 * rotationScale, zIndex: 7 },
+    // T2 - Left, facing inward
+    { xOffsetVw: -25 * baseScale, scale: 0.8 * baseScale, rotateY: 65 * rotationScale, zIndex: 6 },
+    // T3 - Left front, slightly facing inward
+    { xOffsetVw: -12 * baseScale, scale: 0.7 * baseScale, rotateY: 40 * rotationScale, zIndex: 5 },
+    // T4 - Center, facing straight
+    { xOffsetVw: 0, scale: 0.6 * baseScale, rotateY: 0, zIndex: 1 },
+    // T5 - Right front, slightly facing inward
+    { xOffsetVw: 12 * baseScale, scale: 0.7 * baseScale, rotateY: -40 * rotationScale, zIndex: 5 },
+    // T6 - Right, facing inward
+    { xOffsetVw: 25 * baseScale, scale: 0.8 * baseScale, rotateY: -65 * rotationScale, zIndex: 6 },
+    // T7 - Far right edge, facing inward (toward center)
+    { xOffsetVw: 35 * baseScale, scale: 1.0 * baseScale, rotateY: -85 * rotationScale, zIndex: 7 }
+  ];
   
-  // Scale based on distance from center (center tile slightly larger)
-  const distanceAbs = Math.abs(distanceFromCenter);
-  const scale = 1 - (distanceAbs * 0.05); // Subtle size variation
+  const tile = carouselLayout[index] || carouselLayout[3]; // Default to center if out of bounds
   
   return {
-    transform: `translate(${x}px, ${y}px) rotate(${tiltAngle}deg) scale(${scale})`,
-    zIndex: Math.round(10 - distanceAbs), // Center tile on top
+    left: '50%',
+    top: '50%',
+    transform: `translateX(calc(-50% + ${tile.xOffsetVw}vw)) translateY(-50%) rotateY(${tile.rotateY}deg) scale(${tile.scale})`,
+    zIndex: tile.zIndex,
   };
 };
 
@@ -596,8 +606,14 @@ const handleScroll = () => {
   })
 }
 
+const handleResize = () => {
+  // Force re-render of neural nodes when screen size changes
+  neuralNodesKey.value++
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', handleResize)
   
   // Initial animation trigger
   setTimeout(() => {
@@ -612,6 +628,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -866,30 +883,57 @@ onUnmounted(() => {
   letter-spacing: 0.5px;
 }
 
-/* Neural Network LLM Carousel - Flat Tilted Layout */
+/* Neural Network LLM Carousel - Full Width Override */
 .neural-llm-carousel {
   margin-top: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 50vh; /* Full viewport height */
-  width: 100vw;
+  min-height: 50vh;
+  width: 100vw !important;
+  max-width: none !important;
+  position: relative;
   left: 50%;
   right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
   overflow: hidden;
-  position: relative;
-
 }
 
 .neural-perspective-container {
   position: relative;
-  width: 100vw;
-  height: 40vh; /* Full viewport height */
+  width: 100vw !important;
+  max-width: none !important;
+  height: 40vh;
+  min-height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Responsive neural container height */
+@media (max-width: 768px) {
+  .neural-llm-carousel {
+    min-height: 35vh;
+  }
+  
+  .neural-perspective-container {
+    height: 30vh;
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .neural-llm-carousel {
+    min-height: 30vh;
+  }
+  
+  .neural-perspective-container {
+    height: 25vh;
+    min-height: 200px;
+  }
 }
 
 /* Connection Lines between tiles */
@@ -939,33 +983,37 @@ onUnmounted(() => {
   }
 }
 
-/* LLM Neural Nodes - Flat Tilted Tiles */
+/* LLM Neural Nodes - FULL WIDTH FORCE */
 .neural-nodes-container {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90vw;
+  left: 0 !important;
+  right: 0 !important;
+  transform: translateY(-50%);
+  width: 100vw !important;
+  max-width: none !important;
   height: 80vh;
   z-index: 10;
+  perspective: 1500px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .llm-neural-node {
   position: absolute;
   width: 200px;
   height: 280px; /* Taller tiles for better visibility */
-  top: 50%;
-  left: 50%;
-  margin-left: -100px;
-  margin-top: -140px;
   transition: all 0.3s ease;
   cursor: pointer;
   transform-origin: center center;
+  transform-style: preserve-3d; /* Enable 3D transforms on tiles */
 }
 
-.llm-neural-node:hover {
-  transform: scale(1.1) !important;
-}
+/* Removed hover scaling to prevent synaptic network movement */
 
 /* Node Core Container - Flat design */
 .node-core {
@@ -1165,8 +1213,6 @@ onUnmounted(() => {
   .llm-neural-node {
     width: 180px;
     height: 260px;
-    margin-left: -90px;
-    margin-top: -130px;
   }
 }
 
@@ -1174,8 +1220,6 @@ onUnmounted(() => {
   .llm-neural-node {
     width: 160px;
     height: 240px;
-    margin-left: -80px;
-    margin-top: -120px;
   }
   
   .internal-neuron {
@@ -1189,12 +1233,27 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 900px) {
+  .llm-neural-node {
+    width: 140px;
+    height: 200px;
+  }
+  
+  .internal-neuron {
+    width: 7px;
+    height: 7px;
+  }
+  
+  .connection-point {
+    width: 9px;
+    height: 9px;
+  }
+}
+
 @media (max-width: 768px) {
   .llm-neural-node {
     width: 120px;
     height: 180px;
-    margin-left: -60px;
-    margin-top: -90px;
   }
   
   .internal-neuron {
@@ -1206,14 +1265,17 @@ onUnmounted(() => {
     width: 8px;
     height: 8px;
   }
+  
+  /* Hide extreme outer nodes on mobile for better layout */
+  .node-1, .node-7 {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
   .llm-neural-node {
     width: 100px;
     height: 160px;
-    margin-left: -50px;
-    margin-top: -80px;
   }
   
   .internal-neuron {
@@ -1224,6 +1286,11 @@ onUnmounted(() => {
   .connection-point {
     width: 6px;
     height: 6px;
+  }
+  
+  /* Show only center 3 nodes on very small screens */
+  .node-2, .node-6 {
+    display: none;
   }
 }
 

@@ -77,4 +77,9 @@ body {
     min-width: 1200px;
   }
 }
+
+/* Hide Quasar's auto-generated shadow div */
+.q-layout__shadow {
+  display: none !important;
+}
 </style>

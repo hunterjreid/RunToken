@@ -69,7 +69,7 @@ const closeMenu = () => {
 /* Header */
 .floating-header {
   --padding: 0.5em;
-  --header-fill: rgba(255, 255, 255, 0.25);
+  --header-fill: rgba(0, 0, 0, 0.25);
   position: fixed;
   top: 1rem;
   left: 50%;
@@ -89,7 +89,7 @@ const closeMenu = () => {
   flex-direction: column;
   pointer-events: auto;
   backdrop-filter: blur(4px);
-  box-shadow: rgba(255, 255, 255, 0.95) 0px 0px 1em 0.25em inset, rgba(0, 0, 0, 0.2) 0px 0.125em 0.125em -0.125em;
+  box-shadow: rgba(0, 0, 0, 0.95) 0px 0px 1em 0.25em inset, rgba(0, 0, 0, 0.2) 0px 0.125em 0.125em -0.125em;
   margin: 0px auto;
   background: var(--header-fill);
   padding: var(--padding);
