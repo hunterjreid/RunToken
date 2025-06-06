@@ -1,9 +1,23 @@
 <template>
-  <router-view />
+  <div class="app-container">
+    <router-view />
+    
+    <!-- Universal Footer - Show on all pages except app -->
+    <GradientFooter v-if="!isAppRoute" />
+  </div>
 </template>
 
 <script setup>
-// No script needed for router-view
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import GradientFooter from './components/GradientFooter.vue'
+
+const route = useRoute()
+
+// Hide footer on the app route (Dashboard)
+const isAppRoute = computed(() => {
+  return route.path === '/app'
+})
 </script>
 
 <style>
@@ -31,6 +45,13 @@ body {
   width: 100vw;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .gradient-text {

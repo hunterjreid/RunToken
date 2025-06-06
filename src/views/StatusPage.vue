@@ -163,12 +163,19 @@ onMounted(() => {
   min-height: 100vh;
   background: #0a0a0a;
   color: #ffffff;
-  padding: 2rem;
+  padding: 2rem 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
 }
 
 .status-header {
-  max-width: 1200px;
-  margin: 0 auto 3rem;
+  max-width: none;
+  margin: 0 5% 3rem 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -221,8 +228,8 @@ onMounted(() => {
 }
 
 .status-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0 5%;
 }
 
 .section-title {
@@ -327,6 +334,10 @@ onMounted(() => {
 
 .recent-updates {
   margin-bottom: 4rem;
+}
+
+#app {
+  display: block  !important;
 }
 
 .update-item {

@@ -178,42 +178,33 @@
                       </svg>
                     </div>
                     
-                    <!-- LLM Neural Nodes - Curved Screen Tiles -->
+                    <!-- LLM Neural Nodes - AI Company Tiles -->
                     <div class="neural-nodes-container" :key="neuralNodesKey">
                       <div 
-                        v-for="nodeIndex in 7" 
-                        :key="nodeIndex" 
+                        v-for="(company, index) in aiCompanies" 
+                        :key="company.name" 
                         class="llm-neural-node" 
-                        :class="`node-${nodeIndex}`"
-                        :style="getNeuralNodeStyle(nodeIndex - 1)"
+                        :class="`node-${index + 1}`"
+                        :style="getNeuralNodeStyle(index)"
                       >
-                        <!-- Node Core Container - Larger for curved screen tiles -->
+                        <!-- Node Core Container - AI Company Card -->
                         <div class="node-core">
-                          <!-- Internal Neuron Cluster - Scaled for larger tiles -->
-                          <div class="neuron-cluster">
-                            <div 
-                              v-for="neuronIndex in getNeuronCount(nodeIndex - 1)" 
-                              :key="neuronIndex"
-                              class="internal-neuron"
-                              :class="[
-                                `neuron-${neuronIndex}`,
-                                `cluster-${nodeIndex}`
-                              ]"
-                              :style="getNeuronPosition(nodeIndex - 1, neuronIndex - 1)"
-                            >
-                              <div class="neuron-core"></div>
-                              <div class="neuron-glow"></div>
+                          <!-- Company Logo and Info -->
+                          <div class="company-content">
+                            <div class="company-logo">
+                              <q-icon :name="company.icon" class="company-icon" />
                             </div>
+                            <div class="company-name">{{ company.name }}</div>
+                            <div class="company-specialty">{{ company.specialty }}</div>
                           </div>
                           
-                          <!-- Node Edge Connection Points - Scaled for larger tiles -->
-                          <div class="connection-points">
+                          <!-- Subtle Background Animation -->
+                          <div class="ai-background-pattern">
                             <div 
-                              v-for="pointIndex in 6" 
-                              :key="pointIndex"
-                              class="connection-point"
-                              :class="`point-${pointIndex}`"
-                              :style="getConnectionPointStyle(pointIndex - 1)"
+                              v-for="dotIndex in 12" 
+                              :key="dotIndex"
+                              class="ai-dot"
+                              :style="getAiDotPosition(index, dotIndex - 1)"
                             ></div>
                           </div>
                           
@@ -266,6 +257,7 @@
           <section class="features-section" id="features">
             <div class="features-container">
               <div class="feature-card open-source animate-on-scroll">
+                <div class="feature-background"></div>
                 <div class="feature-icon">
                   <q-icon name="inventory" />
                 </div>
@@ -274,19 +266,21 @@
               </div>
               
               <div class="feature-card fast animate-on-scroll-delay">
+                <div class="feature-background"></div>
                 <div class="feature-icon">
-                  <q-icon name="bolt" />
+                  <q-icon name="search" />
                 </div>
-                <h3 class="feature-title">Fast</h3>
-                <p class="feature-subtitle">Latency-optimized routing engine</p>
+                <h3 class="feature-title">Smart Search</h3>
+                <p class="feature-subtitle">Find the perfect model instantly</p>
               </div>
               
               <div class="feature-card private animate-on-scroll-delay-2">
+                <div class="feature-background"></div>
                 <div class="feature-icon">
-                  <q-icon name="lock" />
+                  <q-icon name="rocket_launch" />
                 </div>
-                <h3 class="feature-title">Private</h3>
-                <p class="feature-subtitle">No logging, no retention</p>
+                <h3 class="feature-title">Rocket Fast</h3>
+                <p class="feature-subtitle">Launch signals at light speed</p>
               </div>
             </div>
           </section>
@@ -401,24 +395,7 @@
             </div>
           </section>
 
-          <!-- Footer -->
-          <footer class="footer-section">
-            <div class="footer-content">
-              <div class="footer-brand">
-                <div class="footer-logo">
-                  <div class="lightning-logo">
-                    <q-icon name="bolt" class="lightning-icon" />
-                  </div>
-                  <span class="footer-brand-text">RunToken™ 2025 – Where signals become outcomes.</span>
-                </div>
-              </div>
-              <div class="footer-links">
-                <router-link to="/privacy" class="footer-link">Privacy</router-link>
-                <router-link to="/terms" class="footer-link">Terms</router-link>
-                <router-link to="/status" class="footer-link">Status</router-link>
-              </div>
-            </div>
-          </footer>
+          <!-- Footer removed - now using universal GradientFooter from App.vue -->
         </q-page>
       </q-page-container>
     </q-layout>
@@ -461,6 +438,52 @@ const features = ref([
   }
 ]);
 
+// AI Companies for Neural Tiles
+const aiCompanies = ref([
+  {
+    name: 'OpenAI',
+    icon: 'psychology',
+    specialty: 'ChatGPT & Sora',
+    color: '#10A37F'
+  },
+  {
+    name: 'Microsoft',
+    icon: 'business',
+    specialty: 'Azure AI & Copilot',
+    color: '#0078D4'
+  },
+  {
+    name: 'Google',
+    icon: 'search',
+    specialty: 'Gemini & DeepMind',
+    color: '#4285F4'
+  },
+  {
+    name: 'DeepSeek',
+    icon: 'insights',
+    specialty: 'Advanced Reasoning',
+    color: '#4A90E2'
+  },
+  {
+    name: 'Meta',
+    icon: 'share',
+    specialty: 'Llama Models',
+    color: '#1877F2'
+  },
+  {
+    name: 'Anthropic',
+    icon: 'verified',
+    specialty: 'Claude AI',
+    color: '#FF6B35'
+  },
+  {
+    name: 'Grok',
+    icon: 'auto_awesome',
+    specialty: 'X AI Platform',
+    color: '#1DA1F2'
+  }
+]);
+
 // Flat Horizontal Carousel Layout - Inward Angled Tiles - RESPONSIVE
 const getNeuralNodeStyle = (index) => {
   // Get viewport width to calculate responsive offsets
@@ -472,7 +495,7 @@ const getNeuralNodeStyle = (index) => {
   // Reduce rotation angles on smaller screens for better visibility
   const rotationScale = viewportWidth > 768 ? 1 : 0.6;
   
-  // Full width carousel with inward-facing tiles - RESPONSIVE SPREAD
+  // Full width carousel with inward-facing tiles - RESPONSIVE SPREAD (7 tiles)
   const carouselLayout = [
     // T1 - Far left edge, facing inward (toward center) 
     { xOffsetVw: -35 * baseScale, scale: 1.0 * baseScale, rotateY: 85 * rotationScale, zIndex: 7 },
@@ -585,6 +608,34 @@ const getConnectionPointStyle = (pointIndex) => {
     left: `${x}%`,
     top: `${y}%`,
     animationDelay: `${pointIndex * 300}ms`,
+  };
+};
+
+const getAiDotPosition = (companyIndex, dotIndex) => {
+  // Create subtle animated dots for AI company tiles
+  const patterns = [
+    // Different patterns for each company
+    { spread: 70, density: 0.8 }, // OpenAI
+    { spread: 60, density: 0.9 }, // Microsoft
+    { spread: 80, density: 0.7 }, // Google
+    { spread: 65, density: 0.85 }, // NVIDIA
+    { spread: 75, density: 0.75 }, // Meta
+    { spread: 55, density: 0.95 }, // Anthropic
+    { spread: 85, density: 0.65 }  // Amazon
+  ];
+  
+  const pattern = patterns[companyIndex] || patterns[0];
+  
+  // Pseudo-random positioning based on company and dot index
+  const seed = companyIndex * 100 + dotIndex;
+  const x = 15 + ((seed * 9301 + 49297) % 233280) / 233280 * pattern.spread;
+  const y = 15 + ((seed * 4096 + 150889) % 714025) / 714025 * pattern.spread;
+  
+  return {
+    left: `${Math.max(10, Math.min(85, x))}%`,
+    top: `${Math.max(10, Math.min(85, y))}%`,
+    animationDelay: `${(companyIndex * 200 + dotIndex * 100)}ms`,
+    opacity: pattern.density,
   };
 };
 
@@ -790,19 +841,29 @@ onUnmounted(() => {
 }
 
 .discover-icon {
-  color: #FF4A1C !important;
+  color: #F7D52E !important;
   font-size: 1.2em !important;
   margin-right: 6px !important;
   vertical-align: middle !important;
-  filter: drop-shadow(0 0 8px rgba(255, 74, 28, 0.4));
+  filter: drop-shadow(0 0 8px rgba(247, 213, 46, 0.4));
+  background: linear-gradient(135deg, rgba(247, 213, 46, 0.2) 0%, rgba(255, 193, 7, 0.3) 100%);
+  background-clip: padding-box;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 0 15px rgba(247, 213, 46, 0.3), inset 0 0 10px rgba(247, 213, 46, 0.1);
 }
 
 .rocket-icon {
-  color: #FF4A1C !important;
+  color: #1DA1F2 !important;
   font-size: 1.2em !important;
   margin-right: 6px !important;
   vertical-align: middle !important;
-  filter: drop-shadow(0 0 8px rgba(255, 74, 28, 0.4));
+  filter: drop-shadow(0 0 8px rgba(29, 161, 242, 0.4));
+  background: linear-gradient(135deg, rgba(29, 161, 242, 0.2) 0%, rgba(15, 90, 150, 0.3) 100%);
+  background-clip: padding-box;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 0 15px rgba(29, 161, 242, 0.3), inset 0 0 10px rgba(29, 161, 242, 0.1);
 }
 
 .hero-subheadline strong {
@@ -956,32 +1017,14 @@ onUnmounted(() => {
 }
 
 .synapse-line {
-  stroke-width: 3px;
+  stroke-width: 2px;
   stroke-linecap: round;
   fill: none;
-  opacity: 0.4;
-  animation: connectionFlow 8s ease-in-out infinite;
+  opacity: 0.2;
+  /* Removed complex animation for cleaner look */
 }
 
-/* Connection lines flow from outer tiles toward center */
-.synapse-1 { animation-delay: 0s; } /* Left to center */
-.synapse-2 { animation-delay: 1s; }
-.synapse-3 { animation-delay: 2s; }
-.synapse-4 { animation-delay: 3s; } /* Center connections */
-.synapse-5 { animation-delay: 4s; }
-.synapse-6 { animation-delay: 5s; }
-.synapse-7 { animation-delay: 6s; } /* Right to center */
-
-@keyframes connectionFlow {
-  0%, 80%, 100% { 
-    opacity: 0.2;
-    stroke-width: 2px;
-  }
-  10%, 30% { 
-    opacity: 1;
-    stroke-width: 4px;
-  }
-}
+/* Simplified connection lines - no complex timing */
 
 /* LLM Neural Nodes - FULL WIDTH FORCE */
 .neural-nodes-container {
@@ -1005,8 +1048,8 @@ onUnmounted(() => {
 
 .llm-neural-node {
   position: absolute;
-  width: 200px;
-  height: 280px; /* Taller tiles for better visibility */
+  width: 300px;
+  height: 400px; /* Much larger tiles */
   transition: all 0.3s ease;
   cursor: pointer;
   transform-origin: center center;
@@ -1035,40 +1078,51 @@ onUnmounted(() => {
   transition: all 0.5s ease;
 }
 
-/* LLM Thinking Animation - Flow toward center */
+/* Simplified LLM tiles - minimal animation */
 .llm-neural-node {
-  animation: llmThinkingFlow 14s ease-in-out infinite;
+  opacity: 0.9;
 }
 
-/* Outer tiles light up first, then flow toward center */
-.node-1 { animation-delay: 0s; }    /* Far left starts */
-.node-7 { animation-delay: 0.5s; }  /* Far right starts */
-.node-2 { animation-delay: 2s; }    /* Move inward */
-.node-6 { animation-delay: 2.5s; }  /* Move inward */
-.node-3 { animation-delay: 4s; }    /* Closer to center */
-.node-5 { animation-delay: 4.5s; }  /* Closer to center */
-.node-4 { animation-delay: 6s; }    /* Center tile last - the culmination */
+/* Removed complex thinking animation for cleaner look */
 
-@keyframes llmThinkingFlow {
-  0%, 85%, 100% { 
-    opacity: 0.5;
-  }
-  10%, 25% { 
-    opacity: 1;
-  }
+/* AI Company Content Styling */
+.company-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  width: 80%;
 }
 
-/* When a tile is "thinking", it glows bright */
-.llm-neural-node.thinking .node-core {
-  border-color: rgba(247, 213, 46, 1) !important;
-  box-shadow: 
-    0 25px 80px rgba(247, 213, 46, 0.4),
-    0 10px 40px rgba(255, 74, 28, 0.3),
-    inset 0 3px 0 rgba(255, 255, 255, 0.3) !important;
+.company-logo {
+  margin-bottom: 1rem;
 }
 
-/* Internal Neuron Cluster */
-.neuron-cluster {
+.company-icon {
+  font-size: 3rem;
+  color: #F7D52E;
+  filter: drop-shadow(0 0 10px rgba(247, 213, 46, 0.3));
+}
+
+.company-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.company-specialty {
+  font-size: 0.9rem;
+  color: #aaaaaa;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* AI Background Pattern */
+.ai-background-pattern {
   position: absolute;
   top: 0;
   left: 0;
@@ -1076,108 +1130,43 @@ onUnmounted(() => {
   height: 100%;
   border-radius: 20px;
   overflow: hidden;
+  z-index: 2;
 }
 
-.internal-neuron {
+.ai-dot {
   position: absolute;
-  width: 10px; /* Larger neurons for visibility */
-  height: 10px;
-  border-radius: 50%;
-  transform-origin: center;
-  transition: all 0.3s ease;
-}
-
-.neuron-core {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: 4px;
+  height: 4px;
   background: radial-gradient(circle, #F7D52E 0%, #FF4A1C 100%);
   border-radius: 50%;
-  box-shadow: 0 0 15px rgba(247, 213, 46, 0.6);
-  animation: gentleNeuronPulse 8s ease-in-out infinite;
+  opacity: 0.3;
+  animation: aiDotPulse 4s ease-in-out infinite;
 }
 
-.neuron-glow {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(247, 213, 46, 0.3) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.4;
-}
-
-/* Gentle neuron pulse */
-@keyframes gentleNeuronPulse {
+@keyframes aiDotPulse {
   0%, 100% { 
+    opacity: 0.2;
     transform: scale(1);
-    opacity: 0.7;
   }
   50% { 
-    transform: scale(1.3);
-    opacity: 1;
+    opacity: 0.6;
+    transform: scale(1.5);
   }
 }
 
-/* Different clusters pulse at different times flowing toward center */
-.cluster-1 .neuron-core { animation-delay: 0s; }    /* Far left */
-.cluster-7 .neuron-core { animation-delay: 0.5s; }  /* Far right */
-.cluster-2 .neuron-core { animation-delay: 1s; }    
-.cluster-6 .neuron-core { animation-delay: 1.5s; }  
-.cluster-3 .neuron-core { animation-delay: 2s; }    
-.cluster-5 .neuron-core { animation-delay: 2.5s; }  
-.cluster-4 .neuron-core { animation-delay: 3s; }    /* Center */
-
-/* Connection Points on tile edges */
-.connection-points {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 15;
-}
-
-.connection-point {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: radial-gradient(circle, #F7D52E 0%, #FF4A1C 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 20px rgba(247, 213, 46, 0.8);
-  animation: connectionPulseFlow 10s ease-in-out infinite;
-  transform: translate(-50%, -50%);
-  opacity: 0.7;
-}
-
-@keyframes connectionPulseFlow {
-  0%, 90%, 100% { 
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.4;
-  }
-  10% { 
-    transform: translate(-50%, -50%) scale(2);
-    opacity: 1;
-  }
-}
-
-/* Energy field around each tile */
+/* Simplified energy field around each tile */
 .node-energy-field {
   position: absolute;
-  top: -15px;
-  left: -15px;
-  width: calc(100% + 30px);
-  height: calc(100% + 30px);
-  border-radius: 35px;
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border-radius: 30px;
   background: radial-gradient(ellipse at center, 
-    rgba(247, 213, 46, 0.1) 0%, 
+    rgba(247, 213, 46, 0.05) 0%, 
     transparent 100%);
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.3;
 }
 
 /* Activation ring */
@@ -1203,68 +1192,77 @@ onUnmounted(() => {
     inset 0 3px 0 rgba(255, 255, 255, 0.15);
 }
 
+
+
 .node-4 .internal-neuron {
   width: 12px;
   height: 12px;
 }
 
-/* Responsive Design for Full Screen Flat Layout */
+/* Responsive Design for Full Screen Flat Layout - Larger tiles */
 @media (max-width: 1400px) {
   .llm-neural-node {
-    width: 180px;
-    height: 260px;
+    width: 280px;
+    height: 380px;
   }
 }
 
 @media (max-width: 1200px) {
   .llm-neural-node {
-    width: 160px;
-    height: 240px;
+    width: 250px;
+    height: 350px;
   }
   
-  .internal-neuron {
-    width: 8px;
-    height: 8px;
+  .company-icon {
+    font-size: 2.5rem;
   }
   
-  .connection-point {
-    width: 10px;
-    height: 10px;
+  .company-name {
+    font-size: 1.2rem;
+  }
+  
+  .company-specialty {
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 900px) {
   .llm-neural-node {
-    width: 140px;
-    height: 200px;
+    width: 220px;
+    height: 300px;
   }
   
-  .internal-neuron {
-    width: 7px;
-    height: 7px;
+  .company-icon {
+    font-size: 2.2rem;
   }
   
-  .connection-point {
-    width: 9px;
-    height: 9px;
+  .company-name {
+    font-size: 1.1rem;
+  }
+  
+  .company-specialty {
+    font-size: 0.75rem;
   }
 }
 
 @media (max-width: 768px) {
   .llm-neural-node {
-    width: 120px;
-    height: 180px;
+    width: 180px;
+    height: 250px;
   }
   
-  .internal-neuron {
-    width: 6px;
-    height: 6px;
+  .company-icon {
+    font-size: 2rem;
   }
   
-  .connection-point {
-    width: 8px;
-    height: 8px;
+  .company-name {
+    font-size: 1rem;
   }
+  
+  .company-specialty {
+    font-size: 0.7rem;
+  }
+  
   
   /* Hide extreme outer nodes on mobile for better layout */
   .node-1, .node-7 {
@@ -1274,18 +1272,20 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
   .llm-neural-node {
-    width: 100px;
-    height: 160px;
+    width: 150px;
+    height: 200px;
   }
   
-  .internal-neuron {
-    width: 5px;
-    height: 5px;
+  .company-icon {
+    font-size: 1.8rem;
   }
   
-  .connection-point {
-    width: 6px;
-    height: 6px;
+  .company-name {
+    font-size: 0.9rem;
+  }
+  
+  .company-specialty {
+    font-size: 0.6rem;
   }
   
   /* Show only center 3 nodes on very small screens */
@@ -1481,18 +1481,40 @@ onUnmounted(() => {
   align-items: center;
 }
 
+.feature-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(247, 213, 46, 0.1) 0%, 
+    rgba(255, 107, 53, 0.05) 50%, 
+    transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.feature-card > * {
+  position: relative;
+  z-index: 2;
+}
+
 .feature-card.open-source {
-  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 1px solid #333;
   color: white;
 }
 
 .feature-card.fast {
-  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 1px solid #333;
   color: white;
 }
 
 .feature-card.private {
-  background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 1px solid #333;
   color: white;
 }
 
@@ -1799,58 +1821,7 @@ onUnmounted(() => {
   text-decoration: underline;
 }
 
-/* Footer */
-.footer-section {
-  padding: 60px 5% 40px;
-  background: #111111;
-  border-top: 1px solid #333;
-  width: 100vw;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: auto;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-}
-
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.footer-brand-text {
-  color: #aaaaaa;
-  font-weight: 600;
-}
-
-.footer-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.footer-link {
-  color: #aaaaaa;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #F7D52E;
-}
+/* Footer styles removed - now using universal GradientFooter */
 
 /* Animations */
 .animate-in, .animate-in-delay, .animate-in-delay-2,
@@ -1965,11 +1936,6 @@ onUnmounted(() => {
   
   .pricing-tier.pro {
     transform: none;
-  }
-  
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
   }
 }
 

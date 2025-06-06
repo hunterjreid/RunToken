@@ -151,12 +151,21 @@
   min-height: 100vh;
   background: #0a0a0a;
   color: #ffffff;
-  padding: 2rem;
+  padding: 2rem 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
 }
-
+#app {
+  display: block  !important;
+}
 .terms-header {
-  max-width: 800px;
-  margin: 0 auto 3rem;
+  max-width: none;
+  margin: 0 5% 3rem 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -203,8 +212,8 @@
 }
 
 .terms-content {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0 5%;
 }
 
 .terms-section {
