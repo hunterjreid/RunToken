@@ -24,6 +24,12 @@
                   <q-icon :name="item.icon" class="menu-icon" />
                   <span class="menu-label">{{ item.label }}</span>
                 </div>
+                
+                <!-- Logout button -->
+                <div class="menu-item" @click="handleLogout" style="margin-top: auto; border-top: 1px solid #333; padding-top: 20px;">
+                  <q-icon name="logout" class="menu-icon" />
+                  <span class="menu-label">Logout</span>
+                </div>
               </div>
             </div>
             
@@ -37,10 +43,10 @@
                   <!-- API Usage Overview -->
                   <div class="row q-gutter-md q-mb-xl">
             <div class="col-lg-3 col-md-6 col-sm-12">
-              <q-card class="dark-card">
+                              <q-card class="dark-card">
                 <q-card-section>
                   <div class="text-h6 text-grey-4">API Calls Today</div>
-                  <div class="text-h3 text-primary q-mt-sm">24,580</div>
+                  <div class="text-h3 text-primary q-mt-sm">{{ userStats.apiCallsToday.toLocaleString() }}</div>
                   <div class="text-positive text-caption">↑ 15% from yesterday</div>
                 </q-card-section>
               </q-card>
@@ -50,7 +56,7 @@
               <q-card class="dark-card">
                 <q-card-section>
                   <div class="text-h6 text-grey-4">Usage Cost</div>
-                  <div class="text-h3 text-green q-mt-sm">$12.34</div>
+                  <div class="text-h3 text-green q-mt-sm">${{ userStats.usageCost.toFixed(2) }}</div>
                   <div class="text-caption text-grey-5">$0.0005 per signal</div>
                 </q-card-section>
               </q-card>
@@ -60,7 +66,7 @@
               <q-card class="dark-card">
                 <q-card-section>
                   <div class="text-h6 text-grey-4">Avg Response</div>
-                  <div class="text-h3 text-orange q-mt-sm">47ms</div>
+                  <div class="text-h3 text-orange q-mt-sm">{{ userStats.avgResponse }}ms</div>
                   <div class="text-positive text-caption">↓ 8ms improvement</div>
                 </q-card-section>
               </q-card>
@@ -70,7 +76,7 @@
               <q-card class="dark-card">
                 <q-card-section>
                   <div class="text-h6 text-grey-4">Success Rate</div>
-                  <div class="text-h3 text-positive q-mt-sm">99.8%</div>
+                  <div class="text-h3 text-positive q-mt-sm">{{ userStats.successRate }}%</div>
                   <div class="text-caption text-grey-5">24/7 reliability</div>
                 </q-card-section>
               </q-card>
@@ -129,6 +135,20 @@
                       icon="refresh" 
                       @click="generateNewKey"
                       :loading="generatingKey"
+                    />
+                    <q-btn 
+                      outline 
+                      color="blue" 
+                      label="Load Keys" 
+                      icon="vpn_key" 
+                      @click="loadApiKeys"
+                    />
+                    <q-btn 
+                      outline 
+                      color="green" 
+                      label="Check Health" 
+                      icon="health_and_safety" 
+                      @click="checkBackendHealth"
                     />
                   </div>
                 </q-card-section>
@@ -305,21 +325,24 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
+import { authAPI, apiKeysAPI, analyticsAPI, healthAPI } from '../services/api'
 
 const $q = useQuasar()
+const router = useRouter()
 
-// Generate UUID function
-const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+// User data
+const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const userStats = ref({
+  apiCallsToday: 0,
+  usageCost: 0,
+  avgResponse: 0,
+  successRate: 0
+})
 
-const initialKey = `sk_live_${generateUUID()}`
-const apiKey = ref(initialKey)
-const displayApiKey = ref(initialKey)
+// API Keys
+const apiKeys = ref([])
+const displayApiKey = ref('Click "Load Keys" to fetch your API keys')
 const showAddCreditsDialog = ref(false)
 const selectedPackage = ref(null)
 const selectedPaymentMethod = ref(null)
@@ -454,27 +477,111 @@ const rows = [
   }
 ]
 
+// Data loading functions
+const loadUserData = async () => {
+  try {
+    const userData = await authAPI.getProfile()
+    user.value = userData
+    localStorage.setItem('user', JSON.stringify(userData))
+  } catch (error) {
+    console.error('Failed to load user data:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to load user data',
+      position: 'top-right'
+    })
+  }
+}
+
+const loadApiKeys = async () => {
+  try {
+    const keysData = await apiKeysAPI.getKeys()
+    apiKeys.value = keysData
+    if (keysData.length > 0) {
+      displayApiKey.value = keysData[0].key || keysData[0].key_prefix + '...'
+    }
+  } catch (error) {
+    console.error('Failed to load API keys:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to load API keys',
+      position: 'top-right'
+    })
+  }
+}
+
+const loadAnalytics = async () => {
+  try {
+    const analytics = await analyticsAPI.getUsageStats()
+    userStats.value = {
+      apiCallsToday: analytics.apiCallsToday || 0,
+      usageCost: analytics.usageCost || 0,
+      avgResponse: analytics.avgResponse || 0,
+      successRate: analytics.successRate || 0
+    }
+  } catch (error) {
+    console.error('Failed to load analytics:', error)
+    // Keep dummy data if API fails
+    userStats.value = {
+      apiCallsToday: 24580,
+      usageCost: 12.34,
+      avgResponse: 47,
+      successRate: 99.8
+    }
+  }
+}
+
+const checkBackendHealth = async () => {
+  try {
+    const health = await healthAPI.check()
+    console.log('Backend health:', health)
+    $q.notify({
+      type: 'positive',
+      message: 'Connected to backend successfully!',
+      position: 'top-right'
+    })
+  } catch (error) {
+    console.error('Backend health check failed:', error)
+    $q.notify({
+      type: 'warning',
+      message: 'Backend connection failed - using demo data',
+      position: 'top-right'
+    })
+  }
+}
+
 function copyApiKey() {
-  navigator.clipboard.writeText(apiKey.value)
-  $q.notify({
-    message: 'API Key copied to clipboard!',
-    color: 'positive',
-    position: 'top',
-    icon: 'check_circle'
-  })
+  if (apiKeys.value.length > 0) {
+    const fullKey = apiKeys.value[0].key || displayApiKey.value
+    navigator.clipboard.writeText(fullKey)
+    $q.notify({
+      message: 'API Key copied to clipboard!',
+      color: 'positive',
+      position: 'top',
+      icon: 'check_circle'
+    })
+  } else {
+    $q.notify({
+      message: 'No API keys found. Please generate one first.',
+      color: 'warning',
+      position: 'top',
+      icon: 'warning'
+    })
+  }
 }
 
 const generateNewKey = async () => {
   generatingKey.value = true
   
-  // Simulate API key generation
-  setTimeout(() => {
-    // Generate a new API key with UUID
-    const newKey = `sk_live_${generateUUID()}`
+  try {
+    const newKeyData = await apiKeysAPI.createKey({
+      name: 'Generated Key',
+      environment: 'live',
+      permissions: ['read', 'write']
+    })
     
-    apiKey.value = newKey
-    displayApiKey.value = newKey
-    generatingKey.value = false
+    apiKeys.value.push(newKeyData)
+    displayApiKey.value = newKeyData.key || newKeyData.key_prefix + '...'
     
     $q.notify({
       message: 'New API key generated successfully!',
@@ -482,7 +589,37 @@ const generateNewKey = async () => {
       position: 'top',
       icon: 'vpn_key'
     })
-  }, 1500)
+  } catch (error) {
+    console.error('Failed to generate API key:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to generate API key. Please try again.',
+      position: 'top-right'
+    })
+  } finally {
+    generatingKey.value = false
+  }
+}
+
+// Logout function
+const handleLogout = async () => {
+  try {
+    await authAPI.logout()
+  } catch (error) {
+    console.error('Logout error:', error)
+  } finally {
+    // Clear local storage and redirect regardless of API response
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('user')
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Logged out successfully',
+      position: 'top-right'
+    })
+    
+    router.push('/login')
+  }
 }
 
 const purchaseCredits = async () => {
@@ -613,6 +750,25 @@ const createUsageChart = () => {
 onMounted(async () => {
   await nextTick()
   setTimeout(createUsageChart, 100)
+  
+  // Check if user is logged in
+  if (!localStorage.getItem('authToken')) {
+    router.push('/login')
+    return
+  }
+  
+  // Load initial data
+  checkBackendHealth()
+  loadAnalytics()
+  
+  // Display welcome message
+  setTimeout(() => {
+    $q.notify({
+      type: 'info',
+      message: `Welcome back, ${user.value.first_name || 'User'}!`,
+      position: 'top-right'
+    })
+  }, 1000)
 })
 </script>
 

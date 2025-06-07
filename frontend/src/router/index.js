@@ -3,6 +3,7 @@ import LandingPage from '../views/LandingPage.vue'
 import AboutPage from '../views/AboutPage.vue'
 import Dashboard from '../views/Dashboard.vue'
 import LoginPage from '../views/LoginPage.vue'
+import AuthSuccess from '../views/AuthSuccess.vue'
 import ApiPlayground from '../views/ApiPlayground.vue'
 import StatusPage from '../views/StatusPage.vue'
 import PrivacyPage from '../views/PrivacyPage.vue'
@@ -46,6 +47,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage
+  },
+  {
+    path: '/auth/success',
+    name: 'AuthSuccess',
+    component: AuthSuccess
   },
   {
     path: '/playground',
